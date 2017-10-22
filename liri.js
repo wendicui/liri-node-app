@@ -1,14 +1,7 @@
 var request = require('request');
 var fs = require('fs');
-
-var object = {
-	type:"Fiat", 
-	model:"500", 
-	color:"white"
-
-}
-
-console.log(object)
+//help write data to log.txt
+var result
 //user input
 var input = process.argv
 //change user input into searchable contents
@@ -17,7 +10,6 @@ var search = input[3]
 for (var i = 4; i < input.length; i++) {
 	search += `+${input[i]}`
 }
-
 //console.log(search)
 
 //input api key
@@ -41,10 +33,17 @@ switch(input[2]){
 		break;
 	case "do-what-it-says":
 		random(search);
-		break;
-
+		break
 }
 
+function append(content){
+	fs.appendFile('log.txt', `Command:\n${input.slice(2)}\nResult:\n${content}\n\n\n`, function(err){
+		if(err){console.log(err)}
+		else{
+			console.log("go find data")
+		}
+	})
+}
 
 function movie(search){
 
@@ -56,10 +55,8 @@ function movie(search){
    			 if(content.Title){
 	   			 console.log("-------MOVIE ------")
 
-	   			 var result = {
-
-
-	   			 }
+	   			result = body
+	   			//console.log(result)
 			
 	   			 console.log(`Title is: ${content.Title}`);
 	   			 console.log(`Year is: ${content.Year}`);
@@ -71,9 +68,15 @@ function movie(search){
 	   			 console.log(`Actors are: ${content.Actors}`);
 
 	   			 console.log("-----------------")
+
+
+	   			 append(result);
+
+
 	   		}else{ movie('Mr-Nobody')} 
     }
 	})
+
 }
 
 
