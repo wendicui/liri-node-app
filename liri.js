@@ -1,6 +1,7 @@
 var request = require('request');
 var fs = require('fs');
 var Spotify = require('node-spotify-api')
+var Twitter = require('twitter')
 //help write data to log.txt
 var result
 
@@ -23,10 +24,14 @@ for (var i = 3; i < input.length; i++) {
 
 
 //input api key
-var keys = require('./key.js')
-var moviekey = keys.moviekey
-var spotifykey = keys.spotifykey
-var spotifyid = keys.spotifyid
+var keys = require('./key.js');
+var moviekey = keys.moviekey;
+var spotifykey = keys.spotifykey;
+var spotifyid = keys.spotifyid;
+var conskey = keys.conskey;
+var consec = keys.consec;
+var accToken = keys.accToken;
+var accTokSec = keys.accTokSec;
 
 //check which command line is running
 function check(data ){
@@ -41,7 +46,7 @@ function check(data ){
 			break;
 
 		case "my-tweets":
-			tweet(search);
+			tweet();
 			break;
 		case "do-what-it-says":
 			order();
@@ -133,6 +138,34 @@ function order(){
 		searchspotify = dataArrary[1];
 		check(dataArrary[0])
 
+	})
+}
+
+function tweet(){
+
+	var client = new Twitter({
+		  consumer_key: conskey,
+		  consumer_secret: consec,
+		  access_token_key: accToken,
+		  access_token_secret: accTokSec
+		});
+
+	var params = {screen_name: 'testing trail'};
+	client.get('statuses/user_timeline', params, function(error, tweets, response) {
+		  if (!error) {
+		  	console.log("-------TWEETS------")
+		  	var tweetData = ''
+		    console.log(tweets);
+		    for (var i = 0; i < tweets.length; i++) {
+		    	console.log(tweets[i].created_at)
+		    	console.log(tweets[i].text)
+		    	console.log('-----------')
+		    	tweetData += `\n${tweets[i].text}`
+		    }
+
+		    console.log("-----------------")
+		  }
+		  append(tweetData)
 	})
 }
 
