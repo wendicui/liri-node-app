@@ -1,43 +1,57 @@
 var request = require('request');
 var fs = require('fs');
+var Spotify = require('node-spotify-api')
 //help write data to log.txt
 var result
+
+
 //user input
 var input = process.argv
-//change user input into searchable contents
-var search = input[3]
+//change user input into searchable contents for imdb
+var searchimdb = input[3]
 
 for (var i = 4; i < input.length; i++) {
-	search += `+${input[i]}`
+	searchimdb += `+${input[i]}`
 }
 //console.log(search)
+var searchspotify = ''
+
+for (var i = 3; i < input.length; i++) {
+	searchspotify += `${input[i]} `
+}
+
+
 
 //input api key
 var keys = require('./key.js')
 var moviekey = keys.moviekey
-
+var spotifykey = keys.spotifykey
+var spotifyid = keys.spotifyid
 
 //check which command line is running
-switch(input[2]){
+function check(data ){
+	switch(data){
 
-	case "movie-this":
-		movie(search);
-		break;
+		case "movie-this":
+			movie(searchimdb);
+			break;
 
-	case "spotify-this-song":
-		spotify(search);
-		break;
+		case "spotify-this-song":
+			spot(searchspotify);
+			break;
 
-	case "my-tweets":
-		tweet(search);
-		break;
-	case "do-what-it-says":
-		random(search);
-		break
+		case "my-tweets":
+			tweet(search);
+			break;
+		case "do-what-it-says":
+			order();
+			break
+	}
 }
+check(input[2]);
 
 function append(content){
-	fs.appendFile('log.txt', `Command:\n${input.slice(2)}\nResult:\n${content}\n\n\n`, function(err){
+	fs.appendFile('log.txt', `Command:\n${input[2]} ${searchspotify}\nResult:\n${content}\n\n\n`, function(err){
 		if(err){console.log(err)}
 		else{
 			console.log("go find data")
@@ -77,6 +91,49 @@ function movie(search){
     }
 	})
 
+}
+
+
+function spot(userInput){
+	var spotify = new Spotify({
+								id: spotifyid,
+								secret: spotifykey
+							});
+	console.log(userInput)
+	spotify.search({ type: 'track', 
+					query: userInput,
+					limit: 1 }, function(err, data) {
+
+			  if (err) {
+			    return console.log('Error occurred: ' + err);
+			  }
+ 
+				result = data.tracks.items[0];
+
+				console.log("-------SONG ------")
+
+				console.log(`Song's Name is: ${userInput}`)
+				console.log(`Artist is: ${result.artists[0].name}`)
+				console.log(`The Album is: ${result.album.name}`)
+				console.log(`The link is: ${result.external_urls.spotify}`)
+				
+				console.log("-----------------")
+
+				append(JSON.stringify(result));
+				});
+
+}
+
+
+function order(){
+	fs.readFile("random.txt", "utf8", function(err,data){
+		if (err){ console.log(err)};
+
+		var dataArrary = data.split(",")
+		searchspotify = dataArrary[1];
+		check(dataArrary[0])
+
+	})
 }
 
 
