@@ -124,7 +124,8 @@ function spot(userInput){
 				
 				console.log("-----------------")
 
-				append(JSON.stringify(result));
+				console.log(JSON.stringify(result));
+				console.log(result)
 				});
 
 }
